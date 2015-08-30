@@ -14,7 +14,7 @@ libraryDependencies ++= Seq(
 
   // Web jars
   "org.webjars" % "jquery" % "2.1.3",
-  "org.webjars" % "materializecss" % "0.95.3"
+  "org.webjars" % "materializecss" % "0.96.0"
 )
 
 // Directly dependingon the latest panopCore version from Git

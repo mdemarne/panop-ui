@@ -1,0 +1,89 @@
+@templates.main("Panop") {
+  @templates.headers {
+
+  }
+
+  <div id="index-banner" class="parallax-container">
+    <div class="section no-pad-bot">
+      <div class="container">
+        <br><br>
+        <h1 class="header center deep-orange-text text-lighten-2">Panop</h1>
+        <div class="row center">
+          <h3 class="header col s12 light">Simple Tool For Parallel Online Search</h3>
+        </div>
+         <div class="row center">
+          <a href="#start" id="download-button" class="btn-large waves-effect waves-light deep-orange lighten-1">Get Started</a>
+        </div>
+        <br><br>
+      </div>
+    </div>
+    <div class="parallax"><img src="@routes.Assets.versioned("images/background1.jpg")" alt="Unsplashed background img 1"></div>
+  </div>
+
+
+  <div class="container">
+    <div class="section">
+
+      <div class="row">
+        <div class="col s12 center">
+          <h3><i class="mdi-content-send brown-text"></i></h3>
+          <h4>What is Panop?</h4>
+          <p class="left-align light">Some internal search systems for website are <b>simply not accurate enough</b>. Often, external indexed-based search tools are not sufficient either, <b>especially when the data is moving fast, or only specific subsets of websites are targeted.</b>
+          One way to avoid this is to do online analysis and search: <b>this is what Panop is for.</b>
+          Panop will provide you a <b>simple interface</b> that allow you to select the target of a search and its settings, as well as domain boundaries and search depth. It will then return you <b>a list of URLs matching your requirements and allow you to browse through it</b>. Panop is a command-line-based tool or a web-based tool.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <a id="start"></a>
+  <div class="parallax-container valign-wrapper">
+    <div class="section no-pad-bot">
+      <div class="container">
+        <div class="row center">
+          <h2 class="header center deep-orange-text text-lighten-2">Launch A Search!</h2>
+        </div>
+      </div>
+    </div>
+    <div class="parallax"><img src="@routes.Assets.versioned("images/background2.jpg")" alt="Unsplashed background img 2"></div>
+  </div>
+
+  <div class="container">
+    <div class="section">
+
+      <!--   Icon Section   -->
+      <div class="row">
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center brown-text"><i class="material-icons">flash_on</i></h2>
+            <h5 class="center">Speeds up development</h5>
+
+            <p class="light">We did most of the heavy lifting for you to provide a default stylings that incorporate our custom components. Additionally, we refined animations and transitions to provide a smoother experience for developers.</p>
+          </div>
+        </div>
+
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center brown-text"><i class="material-icons">group</i></h2>
+            <h5 class="center">User Experience Focused</h5>
+
+            <p class="light">By utilizing elements and principles of Material Design, we were able to create a framework that incorporates components and animations that provide more feedback to users. Additionally, a single underlying responsive system across all platforms allow for a more unified user experience.</p>
+          </div>
+        </div>
+
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center brown-text"><i class="material-icons">settings</i></h2>
+            <h5 class="center">Easy to work with</h5>
+
+            <p class="light">We have provided detailed documentation as well as specific code examples to help new users get started. We are also always open to feedback and can answer any questions a user may have about Materialize.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  @templates.footers()
+}

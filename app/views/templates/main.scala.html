@@ -1,0 +1,45 @@
+@(title: String)(content: Html = Html(""))
+@import helper.RichHelpers._
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+  <title>@title</title>
+
+  <!-- CSS  -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="@routes.Assets.versioned("lib/materializecss/css/materialize.min.css")" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="@routes.Assets.versioned("stylesheets/style.css")" type="text/css" rel="stylesheet" media="screen,projection"/>
+
+</head>
+<body>
+
+  @content
+
+  <!--  Scripts-->
+  <script src="@routes.Assets.versioned("lib/jquery/jquery.js")"></script>
+  <script src="@routes.Assets.versioned("lib/materializecss/js/materialize.js")"></script>
+  <script src="@routes.Assets.versioned("javascripts/init.js")"></script>
+
+  <!--   Smooth Scrolling -->
+  <script>
+  $(function() {
+    $('a[href*=#]:not([href=#])').click(function() {
+      if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') && location.hostname == this.hostname) {
+        var target = $(this.hash);
+        target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
+        if (target.length) {
+          $('html,body').animate({
+            scrollTop: target.offset().top
+          }, 1000);
+          return false;
+        }
+      }
+    });
+  });
+  </script>
+
+  </body>
+</html>
