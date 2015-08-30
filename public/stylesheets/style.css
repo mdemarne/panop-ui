@@ -55,3 +55,8 @@ p {
 footer.page-footer {
   margin: 0;
 }
+
+.form-errors {
+  font-weight: bold;
+  color: #FF0000;
+}
