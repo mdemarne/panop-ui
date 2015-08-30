@@ -11,6 +11,9 @@ import play.api.data.Forms._
 import play.api.data.validation._
 import play.api.data.validation.Constraints._
 
+import scala.util.{Try, Failure, Success}
+import scala.util.matching.Regex
+
 import panop._
 import panop.com._
 
@@ -31,11 +34,18 @@ class Application extends Controller {
 
   /* Verifying that the query is in proper normal form */
   val isQueryInNormalForm: Constraint[String] = Constraint("constraints.isQueryInNormalForm")({
-  plainText =>
-    QueryParser(plainText) match {
-      case Right(r) => Invalid(r)
-      case _ => Valid
+    plainText =>
+      QueryParser(plainText) match {
+        case Right(err) => Invalid(err)
+        case _ => Valid
     }
+  })
+  val isRegex: Constraint[String] = Constraint("constraints.isRegex")({
+    plainText =>
+      Try(new Regex(plainText)) match {
+        case Failure(err) => Invalid(err.getMessage)
+        case _ => Valid
+      }
   })
 
   val launchForm = Form(
@@ -45,9 +55,9 @@ class Application extends Controller {
       "depth" -> number.verifying(min(0), max(100)),
       "domain" -> text,
       "mode" -> text,
-      "ignoredExts" -> text,
-      "boundariesTop" -> text,
-      "boundariesBottom" -> text,
+      "ignoredExts" -> text.verifying(isRegex),
+      "boundariesTop" -> text.verifying(isRegex),
+      "boundariesBottom" -> text.verifying(isRegex),
       "maxSlaves" -> number.verifying(min(1), max(Query.defMaxSlaves))
     )(RawQuery.apply)(RawQuery.unapply))
 
@@ -63,7 +73,7 @@ class Application extends Controller {
     launchForm.bindFromRequest.fold(
       formWithErrors => BadRequest(views.html.home(formWithErrors)),
       rawQuery => {
-        Ok(views.html.home(launchForm))
+        Ok(views.html.home(launchForm)) // TODO: launch a search
       }
     )
   }

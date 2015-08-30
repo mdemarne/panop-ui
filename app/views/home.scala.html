@@ -94,18 +94,18 @@
               </div>
               <div class="row">
                 <div class="input-field col s12">
-                  @helper.inputText(launchForm("ignoredExts"), '_label -> "Ignored Extensions",  'icon -> "mdi-image-center-focus-strong")
-                  <p>This is the list of ignored filed extensions (separated by <b>|</b>).</p>
+                  @helper.inputText(launchForm("ignoredExts"), '_label -> "Ignored Extensions",  'icon -> "mdi-image-center-focus-strong", '_showConstraints -> false)
+                  <p>This is the list of ignored filed extensions (separated by <b>|</b>, i.e. in Regular Expression).</p>
                 </div>
               </div>
               <div class="row">
                 <div class="input-field col s12 l6">
                   @helper.inputText(launchForm("boundariesTop"), '_label -> "Top Boundaries", 'icon -> "mdi-editor-format-textdirection-l-to-r", '_showConstraints -> false)
-                  <p>HTML tag(s) before which content will be ignored.</p>
+                  <p>HTML tag(s) before which content will be ignored (in Regular Expression).</p>
                 </div>
                 <div class="input-field col s12 l6">
-                  @helper.inputText(launchForm("boundariesBottom"), '_label -> "Bottom Boundaries", 'icon -> "mdi-editor-format-textdirection-r-to-l")
-                  <p>HTML tag(s) after which content will be ignored.</p>
+                  @helper.inputText(launchForm("boundariesBottom"), '_label -> "Bottom Boundaries", 'icon -> "mdi-editor-format-textdirection-r-to-l", '_showConstraints -> false)
+                  <p>HTML tag(s) after which content will be ignored (in Regular Expression).</p>
                 </div>
               </div>
               <div class="row">
