@@ -106,8 +106,8 @@ class Main extends Controller {
       formWithErrors => BadRequest(views.html.home(formWithErrors)),
       rawQuery => {
         /* NB: the query here is proper, as well as all regexes, no need to check them once more */
-        val id = (new Random).nextString(5)
-        val asys = ActorSystem.create(s"Panop-$id")
+        val id = (new Random).nextInt.toString
+        val asys = ActorSystem.create(s"Panop$id")
         val master = asys.actorOf(Props(new Master(asys, rawQuery.maxSlaves)))
         val parsedQuery = QueryParser(rawQuery.query).left.get
         val domain = rawQuery.domain match {

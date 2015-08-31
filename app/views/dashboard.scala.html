@@ -31,7 +31,7 @@
               <p id="loading-text">LOADING</p>
             </div>
             <div class="col s12 l4">
-              <a href="#start" id="download-button" class="btn-large waves-effect waves-light deep-orange lighten-1">Stop</a>
+              <a href="@routes.Search.stop(id)" id="download-button" class="btn-large waves-effect waves-light deep-orange lighten-1">Stop</a>
             </div>
           </div>
         </div>
@@ -47,6 +47,9 @@
 
     </div>
   </div>
+
+
+  @playscalajs.html.scripts("scalaJsClient")
 
    @templates.footers()
 

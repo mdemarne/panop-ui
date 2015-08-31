@@ -20,3 +20,4 @@ activator-launch-1.3.5.jar
 activator
 *.swp
 *.swo
+scala-js/client/target/
