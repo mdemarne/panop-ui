@@ -28,6 +28,7 @@ import akka.actor._
 import panop._
 import panop.com._
 
+import common.Settings
 
 //TODO: there must be a much nicer way than using that bean and converting it afterwards
 case class RawQuery(
@@ -41,8 +42,13 @@ case class RawQuery(
   botBnds: String,
   maxSlaves: Int)
 
+/**
+ * Global controller.
+ * @author Mathieu Demarne (mathieu.demarne@gmail.com)
+ */
+
 class Application extends Controller {
-  import panop.Enrichments._
+  import common.Enrichments._
 
   /* Helpers */
 
@@ -72,11 +78,11 @@ class Application extends Controller {
       "ignExts" -> text.verifying(isRegex),
       "topBnds" -> text.verifying(isRegex),
       "botBnds" -> text.verifying(isRegex),
-      "maxSlaves" -> number.verifying(min(1), max(Settings.defMaxSlaves))
+      "maxSlaves" -> number.verifying(min(1), max(panop.Settings.defMaxSlaves))
     )(RawQuery.apply)(RawQuery.unapply))
 
   val defaultForm = launchForm.fill(
-    RawQuery("", "", 5, "", "BFS", Settings.defIgnExts.regex, Settings.defTopBnds.regex, Settings.defBotBnds.regex, Settings.defSlaves) // TODO: move "5" in app settings
+    RawQuery("", "", 5, "", "BFS", panop.Settings.defIgnExts.regex, panop.Settings.defTopBnds.regex, panop.Settings.defBotBnds.regex, panop.Settings.defSlaves) // TODO: move "5" in app settings
   )
 
   /* Actions */
@@ -115,7 +121,7 @@ class Application extends Controller {
 
   def dashboard(id: String) = Action { implicit request =>
     Cache.get(id) match {
-      case Some((_, master: ActorRef)) => Ok(views.html.dashboard(id, isLive = true))
+      case Some((_, master: ActorRef)) => Ok(views.html.dashboard(id, staticResults = None))
       case None => Redirect(routes.Application.home()) // TODO
     }
   }
@@ -127,7 +133,7 @@ class Application extends Controller {
         Redirect(routes.Application.home())
       case None => Redirect(routes.Application.dashboard(id)) // TODO
     }
-    Ok(views.html.dashboard(id, isLive = false))
+    Redirect(routes.Application.dashboard(id))
   }
 
   /* Web Sockets */
@@ -137,7 +143,7 @@ class Application extends Controller {
       /* Internal controls */
       case id: String => 
         out ! JsNull
-        //self >! ("Ping", Settings.livemapUpdateRate) // TODO
+        self >! (id, Settings.updateRate) // TODO
       case othr => Logger.error(s"Display: web socket receiving inconsistent message: ${othr}.")
     }
   }})
