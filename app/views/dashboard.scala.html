@@ -4,7 +4,7 @@
 
 @templates.main("Panop - dashboard") {
   @templates.headers {
-    <li><a href="@routes.Application.home()">Home</a></li>
+    <li><a href="@routes.Main.home()">Home</a></li>
   }
 
  <div class="container">
@@ -14,7 +14,7 @@
         <div class="col s12 l6">
           <h4 class="deep-orange-text">Search Permanent URL</h4>
           <label for="url">Please, keep this URL to access your results. They will be kept for a week only before being erased.</label>
-          <input type="text" id="url" name="url" value="@routes.Application.dashboard(id).absoluteURL" icon="mdi-image-center-focus-strong"/>
+          <input type="text" id="url" name="url" value="@routes.Search.dashboard(id).absoluteURL" icon="mdi-image-center-focus-strong"/>
 
         </div>
         <div class="col s12 l6">

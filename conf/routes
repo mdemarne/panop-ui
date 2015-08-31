@@ -3,10 +3,10 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.home
-POST    /                           controllers.Application.launch
-GET     /dashboard/:id              controllers.Application.dashboard(id: String)
-GET     /stop/:id                   controllers.Application.stop(id: String)
+GET     /                           controllers.Main.home
+POST    /                           controllers.Main.launch
+GET     /dashboard/:id              controllers.Search.dashboard(id: String)
+GET     /stop/:id                   controllers.Search.stop(id: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

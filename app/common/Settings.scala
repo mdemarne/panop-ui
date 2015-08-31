@@ -11,4 +11,5 @@ import scala.concurrent.duration._
  */
 object Settings {
   val updateRate = 500.milliseconds // TODO: put that in Play configuration files
+  val defDepth = 5 // TODO: idem
 }

@@ -43,11 +43,11 @@ case class RawQuery(
   maxSlaves: Int)
 
 /**
- * Global controller.
+ * Global controller to launch a search.
  * @author Mathieu Demarne (mathieu.demarne@gmail.com)
  */
 
-class Application extends Controller {
+class Main extends Controller {
   import common.Enrichments._
 
   /* Helpers */
@@ -60,6 +60,8 @@ class Application extends Controller {
         case _ => Valid
     }
   })
+
+  /* Verifying that a regex is actually a regex */
   val isRegex: Constraint[String] = Constraint("constraints.isRegex")({
     plainText =>
       Try(new Regex(plainText)) match {
@@ -72,7 +74,7 @@ class Application extends Controller {
     mapping(
       "query" -> nonEmptyText.verifying(isQueryInNormalForm),
       "url" -> nonEmptyText,
-      "depth" -> number.verifying(min(0), max(100)),
+      "depth" -> number.verifying(min(0), max(panop.Settings.defMaxDepth)),
       "domain" -> text,
       "mode" -> text,
       "ignExts" -> text.verifying(isRegex),
@@ -82,7 +84,17 @@ class Application extends Controller {
     )(RawQuery.apply)(RawQuery.unapply))
 
   val defaultForm = launchForm.fill(
-    RawQuery("", "", 5, "", "BFS", panop.Settings.defIgnExts.regex, panop.Settings.defTopBnds.regex, panop.Settings.defBotBnds.regex, panop.Settings.defSlaves) // TODO: move "5" in app settings
+    RawQuery(
+      query = "", 
+      url = "", 
+      depth = panop.Settings.defDepth, 
+      domain = "", 
+      mode = panop.Settings.defMode.toString, 
+      ignExts = panop.Settings.defIgnExts.regex, 
+      topBnds = panop.Settings.defTopBnds.regex, 
+      botBnds = panop.Settings.defBotBnds.regex, 
+      maxSlaves = panop.Settings.defSlaves
+    )
   )
 
   /* Actions */
@@ -106,46 +118,17 @@ class Application extends Controller {
           case "BFS" => BFSMode
           case "DFS" => DFSMode
           case "RND" => RNDMode
-          case _ => BFSMode
+          case _ => panop.Settings.defMode /* Jumping back to default mode */
         }
+        /* Launching a query */
         val search = Search(
           Url(rawQuery.url), 
           Query(parsedQuery._1, parsedQuery._2, rawQuery.depth, domain, mode, new Regex(rawQuery.ignExts), (new Regex(rawQuery.topBnds), new Regex(rawQuery.botBnds)))
         )
         master ! search
         Cache.set(id, (asys, master))
-        Redirect(routes.Application.dashboard(id))
+        Redirect(routes.Search.dashboard(id))
       }
     )
   }
-
-  def dashboard(id: String) = Action { implicit request =>
-    Cache.get(id) match {
-      case Some((_, master: ActorRef)) => Ok(views.html.dashboard(id, staticResults = None))
-      case None => Redirect(routes.Application.home()) // TODO
-    }
-  }
-
-  def stop(id: String) = Action { implicit request =>
-    Cache.get(id) match {
-      case Some((asys: ActorSystem, _)) => 
-        asys.shutdown()
-        Redirect(routes.Application.home())
-      case None => Redirect(routes.Application.dashboard(id)) // TODO
-    }
-    Redirect(routes.Application.dashboard(id))
-  }
-
-  /* Web Sockets */
-
-  def liveSocket = WebSocket.acceptWithActor[String, JsValue](request => out => Props { new Actor {
-    def receive = {
-      /* Internal controls */
-      case id: String => 
-        out ! JsNull
-        self >! (id, Settings.updateRate) // TODO
-      case othr => Logger.error(s"Display: web socket receiving inconsistent message: ${othr}.")
-    }
-  }})
-
 }
