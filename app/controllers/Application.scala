@@ -13,6 +13,12 @@ import play.api.data.Forms._
 import play.api.data.validation._
 import play.api.data.validation.Constraints._
 
+import play.api.libs.json._
+import play.api.mvc.WebSocket.FrameFormatter
+import play.api.libs.concurrent._
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.libs.Akka
+
 import scala.util.{Try, Failure, Success}
 import scala.util.matching.Regex
 import scala.util.Random
@@ -22,6 +28,8 @@ import akka.actor._
 import panop._
 import panop.com._
 
+
+//TODO: there must be a much nicer way than using that bean and converting it afterwards
 case class RawQuery(
   query: String,
   url: String,
@@ -34,6 +42,7 @@ case class RawQuery(
   maxSlaves: Int)
 
 class Application extends Controller {
+  import panop.Enrichments._
 
   /* Helpers */
 
@@ -63,10 +72,12 @@ class Application extends Controller {
       "ignExts" -> text.verifying(isRegex),
       "topBnds" -> text.verifying(isRegex),
       "botBnds" -> text.verifying(isRegex),
-      "maxSlaves" -> number.verifying(min(1), max(Query.defMaxSlaves))
+      "maxSlaves" -> number.verifying(min(1), max(Settings.defMaxSlaves))
     )(RawQuery.apply)(RawQuery.unapply))
 
-  val defaultForm = launchForm.fill(RawQuery("", "", 5, "", "BFS", Query.defIgnExts.regex, Query.defTopBnds.regex, Query.defBotBnds.regex, Query.defSlaves))
+  val defaultForm = launchForm.fill(
+    RawQuery("", "", 5, "", "BFS", Settings.defIgnExts.regex, Settings.defTopBnds.regex, Settings.defBotBnds.regex, Settings.defSlaves) // TODO: move "5" in app settings
+  )
 
   /* Actions */
 
@@ -76,8 +87,8 @@ class Application extends Controller {
     launchForm.bindFromRequest.fold(
       formWithErrors => BadRequest(views.html.home(formWithErrors)),
       rawQuery => {
-        /* NB: the query here is proper, as well as all regexes */
-        val id = (new Random).nextLong.toString
+        /* NB: the query here is proper, as well as all regexes, no need to check them once more */
+        val id = (new Random).nextString(5)
         val asys = ActorSystem.create(s"Panop-$id")
         val master = asys.actorOf(Props(new Master(asys, rawQuery.maxSlaves)))
         val parsedQuery = QueryParser(rawQuery.query).left.get
@@ -91,7 +102,10 @@ class Application extends Controller {
           case "RND" => RNDMode
           case _ => BFSMode
         }
-        val search = Search(Url(rawQuery.url), Query(parsedQuery._1, parsedQuery._2, rawQuery.depth, domain, mode, new Regex(rawQuery.ignExts), (new Regex(rawQuery.topBnds), new Regex(rawQuery.botBnds))))
+        val search = Search(
+          Url(rawQuery.url), 
+          Query(parsedQuery._1, parsedQuery._2, rawQuery.depth, domain, mode, new Regex(rawQuery.ignExts), (new Regex(rawQuery.topBnds), new Regex(rawQuery.botBnds)))
+        )
         master ! search
         Cache.set(id, (asys, master))
         Redirect(routes.Application.dashboard(id))
@@ -99,6 +113,33 @@ class Application extends Controller {
     )
   }
 
-  def dashboard(id: String) = Action(Ok(views.html.dashboard()))
+  def dashboard(id: String) = Action { implicit request =>
+    Cache.get(id) match {
+      case Some((_, master: ActorRef)) => Ok(views.html.dashboard(id, isLive = true))
+      case None => Redirect(routes.Application.home()) // TODO
+    }
+  }
+
+  def stop(id: String) = Action { implicit request =>
+    Cache.get(id) match {
+      case Some((asys: ActorSystem, _)) => 
+        asys.shutdown()
+        Redirect(routes.Application.home())
+      case None => Redirect(routes.Application.dashboard(id)) // TODO
+    }
+    Ok(views.html.dashboard(id, isLive = false))
+  }
+
+  /* Web Sockets */
+
+  def liveSocket = WebSocket.acceptWithActor[String, JsValue](request => out => Props { new Actor {
+    def receive = {
+      /* Internal controls */
+      case id: String => 
+        out ! JsNull
+        //self >! ("Ping", Settings.livemapUpdateRate) // TODO
+      case othr => Logger.error(s"Display: web socket receiving inconsistent message: ${othr}.")
+    }
+  }})
 
 }
