@@ -43,7 +43,9 @@ class Search extends Controller {
   def dashboard(id: String) = Action { implicit request =>
     Cache.get(id) match {
       case Some((_, master: ActorRef)) => Ok(views.html.dashboard(id, staticResults = None))
-      case _ => Redirect(routes.Main.home()) // TODO
+      case _ => 
+        Logger.error(s"Search with id $id does not exist.")
+        Redirect(routes.Main.home()) // TODO
     }
   }
 
@@ -52,8 +54,9 @@ class Search extends Controller {
       case Some((asys: ActorSystem, _)) => 
         asys.shutdown()
         Redirect(routes.Main.home())
-      case _ => Redirect(routes.Search.dashboard(id)) // TODO
+      case _ => Redirect(routes.Search.dashboard(id))
     }
+    Logger.error(s"Search: cannot stop id $id, which must already be stopped or does not exist.")
     Redirect(routes.Search.dashboard(id))
   }
 

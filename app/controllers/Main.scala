@@ -28,9 +28,7 @@ import akka.actor._
 import panop._
 import panop.com._
 
-import common.Settings
-
-//TODO: there must be a much nicer way than using that bean and converting it afterwards
+//TODO: there must be a much nicer way than using that bean and converting it afterwards, but it does not matter right now.
 case class RawQuery(
   query: String,
   url: String,
@@ -49,6 +47,7 @@ case class RawQuery(
 
 class Main extends Controller {
   import common.Enrichments._
+  import common.Settings
 
   /* Helpers */
 
@@ -83,6 +82,7 @@ class Main extends Controller {
       "maxSlaves" -> number.verifying(min(1), max(panop.Settings.defMaxSlaves))
     )(RawQuery.apply)(RawQuery.unapply))
 
+  // TODO: use the unapply from the case class above might avoid having to write that down again!
   val defaultForm = launchForm.fill(
     RawQuery(
       query = "", 
@@ -123,7 +123,15 @@ class Main extends Controller {
         /* Launching a query */
         val search = Search(
           Url(rawQuery.url), 
-          Query(parsedQuery._1, parsedQuery._2, rawQuery.depth, domain, mode, new Regex(rawQuery.ignExts), (new Regex(rawQuery.topBnds), new Regex(rawQuery.botBnds)))
+          Query(
+            poss = parsedQuery._1, 
+            negs = parsedQuery._2, 
+            maxDepth = rawQuery.depth, 
+            domain = domain, 
+            mode = mode, 
+            ignoredFileExtensions = new Regex(rawQuery.ignExts), 
+            boundaries = (new Regex(rawQuery.topBnds), new Regex(rawQuery.botBnds))
+          )
         )
         master ! search
         Cache.set(id, (asys, master))
