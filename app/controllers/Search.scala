@@ -62,12 +62,13 @@ class Search extends Controller {
 
   /* Web Sockets */
 
-  def liveSocket = WebSocket.acceptWithActor[String, JsValue](request => out => Props { new Actor {
+  def dashboardSocket(id: String) = WebSocket.acceptWithActor[String, JsValue](request => out => Props { new Actor {
     def receive = {
       /* Internal controls */
-      case id: String => 
+      case "ping" => 
+        println("hi")
         out ! JsNull
-        self >! (id, Settings.updateRate) // TODO
+        self >! ("ping", Settings.updateRate) // TODO
       case othr => Logger.error(s"Display: web socket receiving inconsistent message: ${othr}.")
     }
   }})

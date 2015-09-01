@@ -6,7 +6,7 @@ lazy val root = (project in file(".")).settings(
     name := """panop-web""",
     version := "1.0-SNAPSHOT",
     scalaVersion := scalaV,
-    scalaJSProjects := Seq(scalaJsClient),
+    scalaJSProjects := Seq(scalaJsFrontend),
     pipelineStages := Seq(scalaJSProd, gzip),
     libraryDependencies ++= Seq(
       jdbc,
@@ -21,8 +21,8 @@ lazy val root = (project in file(".")).settings(
     ),
     resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
   ).enablePlugins(PlayScala, SbtWeb, PlayScalaJS)
-  .aggregate(projectToRef(scalaJsClient))
-  .dependsOn(panopCore)
+  .aggregate(projectToRef(scalaJsFrontend))
+  .dependsOn(panopCore, scalaJsSharedJVM)
 
 // Directly dependingon the latest panopCore version from Git
 lazy val panopCore = RootProject(uri("https://github.com/mdemarne/panop-core.git"))
@@ -31,9 +31,18 @@ lazy val panopCore = RootProject(uri("https://github.com/mdemarne/panop-core.git
 // other, legacy style, accesses its actions statically.
 routesGenerator := InjectedRoutesGenerator
 
-// Scala JS
+// Scala JS -- Shared
 
-lazy val scalaJsClient = (project in file("scala-js/client/")).settings(
+lazy val scalaJsShared = (crossProject.crossType(CrossType.Pure) in file("scala-js/shared/")).
+  settings(scalaVersion := scalaV).
+  jsConfigure(_ enablePlugins ScalaJSPlay)
+
+lazy val scalaJsSharedJVM = scalaJsShared.jvm
+lazy val scalaJsSharedJS = scalaJsShared.js
+
+// Scala Js -- Client
+
+lazy val scalaJsFrontend = (project in file("scala-js/frontend/")).settings(
   scalaVersion := scalaV,
   persistLauncher := true,
   persistLauncher in Test := false,
@@ -43,4 +52,7 @@ lazy val scalaJsClient = (project in file("scala-js/client/")).settings(
     "com.lihaoyi" %%% "scalarx" % "0.2.8",
     "be.doeraene" %%% "scalajs-jquery" % "0.8.0",
     "com.lihaoyi" %%% "upickle" % "0.3.4"
-  )).enablePlugins(ScalaJSPlugin, ScalaJSPlay)
+  )).enablePlugins(ScalaJSPlugin, ScalaJSPlay).dependsOn("scalaJsSharedJS")
+
+// Loads the Play project at sbt startup
+onLoad in Global := (Command.process("project root", _: State)) compose (onLoad in Global).value
