@@ -70,7 +70,7 @@ class Search extends Controller {
             (master !? com.AskProgress, master !? com.AskResults) match {
               case (pp: com.AswProgress, pr: com.AswResults) =>
                 val tick = DashboardTick(
-                  SProgress(pp.percent, pp.nbExplored, pp.nbFound, pp.nbMatches), 
+                  SProgress(pp.percent, pp.nbExplored, pp.nbFound, pp.nbMatches, pp.nbMissed), 
                   pr.results.map(r => SResult(r.search.url.link, com.Query.printNormalForm(r.matches)))
                 )
                 out ! write(tick)

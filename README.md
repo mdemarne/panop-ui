@@ -3,8 +3,3 @@ Simple Tool For Parallel Online Search - Tiny Web interface
 
 ## About
 This is a tiny web-based interface for Panop. For the core and the command-line tool, please refer to https://github.com/mdemarne/panop-core.
-
-## TODO
-- Add a maximum number of time for a search
-- Save results
-- Build result UI

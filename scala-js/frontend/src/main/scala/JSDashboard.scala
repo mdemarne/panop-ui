@@ -30,7 +30,7 @@ object JSDashboard extends js.JSApp {
     socket.onmessage = { (e: MessageEvent) => 
       val tick = read[DashboardTick](e.data.toString)
       jQuery("#loading-bar").css("width", (tick.progress.percent*100).toInt + "%")
-      jQuery("#loading-text").text(s"Explored ${tick.progress.nbExplored} over ${tick.progress.nbFound}, ${tick.progress.nbMatches} matches")
+      jQuery("#loading-text").text(s"Explored ${tick.progress.nbExplored} over ${tick.progress.nbFound}, ${tick.progress.nbMatches} matches, ${tick.progress.nbMissed} not reachable.")
       val resultsList = tick.results.map {res =>
         s"""
           |<div class="row">
