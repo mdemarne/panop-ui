@@ -52,19 +52,16 @@ class Search extends Controller {
 
   def stop(id: String) = Action { implicit request =>
     Cache.get(id) match {
-      case Some((asys: ActorSystem, _)) => 
-        asys.shutdown()
-        Redirect(routes.Main.home())
-      case _ => Redirect(routes.Search.dashboard(id))
+      case Some((asys: ActorSystem, _)) => asys.shutdown()
+      case _ => Logger.error(s"Search: cannot stop id $id, which must already be stopped or does not exist.")
     }
-    Logger.error(s"Search: cannot stop id $id, which must already be stopped or does not exist.")
     Redirect(routes.Search.dashboard(id))
   }
 
   /* Web Sockets */
 
   // TODO: there is no need of connecting twice to the master, but this is the way panop is buid. Should be changed in the future.
-  def dashboardSocket(id: String) = WebSocket.acceptWithActor[String, JsValue](request => out => Props { new Actor {
+  def dashboardSocket(id: String) = WebSocket.acceptWithActor[String, String](request => out => Props { new Actor {
     def receive = {
       /* Internal controls */
       case "ping" =>
@@ -72,13 +69,15 @@ class Search extends Controller {
           case Some((_, master: ActorRef)) =>
             (master !? com.AskProgress, master !? com.AskResults) match {
               case (pp: com.AswProgress, pr: com.AswResults) =>
-                val tick = DashboardTick(SProgress(pp.percent, pp.nbExplored, pp.nbFound, pp.nbMatches), pr.results.map(r => SResult(r.search.url.link, com.Query.printNormalForm(r.matches))))
+                val tick = DashboardTick(
+                  SProgress(pp.percent, pp.nbExplored, pp.nbFound, pp.nbMatches), 
+                  pr.results.map(r => SResult(r.search.url.link, com.Query.printNormalForm(r.matches)))
+                )
                 out ! write(tick)
               case _ => Logger.error(s"Inconsistent message from Master.")
             }
           case _ => Logger.error(s"Search with id $id is not live!")
         }
-        out ! JsNull
         self >! ("ping", Settings.updateRate) // TODO
       case othr => Logger.error(s"Display: web socket receiving inconsistent message: ${othr}.")
     }

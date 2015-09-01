@@ -1,4 +1,4 @@
-@(id: String, staticResults: Option[List[panop.com.Result]])(implicit request: RequestHeader)
+@(id: String, staticResults: Option[List[panop.web.shared.models.SResult]])(implicit request: RequestHeader)
 
 @import helper.RichHelpers._
 
@@ -22,7 +22,7 @@
           <div class="row">
             <div class="col s12 l12">
               <div class="progress">
-                <div class="determinate" style="width: 0%" id="loading-bar"></div>
+                <div class="determinate" style="width: 0%;" id="loading-bar"></div>
               </div>
             </div>
           </div>
@@ -51,7 +51,7 @@
   @playscalajs.html.scripts("scalaJsFrontend")
 
   <script>
-    startOn(@id);
+    JSDashboard().startOn("@id");
   </script>
 
    @templates.footers()

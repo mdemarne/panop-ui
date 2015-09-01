@@ -1,17 +1,20 @@
 @(menu: Html)
 
-@if(menu.body.trim != "") {
-  <nav class="white" role="navigation">
-    <div class="nav-wrapper container">
-      <a id="logo-container" href="#" class="brand-logo">Panop</a>
-      <ul class="right hide-on-med-and-down">
-        @menu
-      </ul>
+  <header>
+    @if(menu.body.trim != "") {
+      <nav class="white" role="navigation">
+        <div class="nav-wrapper container">
+          <a id="logo-container" href="#" class="brand-logo">Panop</a>
+          <ul class="right hide-on-med-and-down">
+            @menu
+          </ul>
 
-      <ul id="nav-mobile" class="side-nav">
-        @menu
-      </ul>
-      <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
-    </div>
-  </nav>
-}
+          <ul id="nav-mobile" class="side-nav">
+            @menu
+          </ul>
+          <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+        </div>
+      </nav>
+    }
+  </header>
+  <main>
