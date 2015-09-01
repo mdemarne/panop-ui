@@ -46,8 +46,8 @@ case class RawQuery(
  */
 
 class Main extends Controller {
-  import common.Enrichments._
-  import common.Settings
+  import panop.web.common.Enrichments._
+  import panop.web.common.Settings
 
   /* Helpers */
 

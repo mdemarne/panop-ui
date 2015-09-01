@@ -28,15 +28,14 @@ import akka.actor._
 import panop._
 import panop.com._
 
-import common.Settings
+import panop.web.common.Settings
 
 /**
  * Global controller for a running search.
  * @author Mathieu Demarne (mathieu.demarne@gmail.com)
  */
-
 class Search extends Controller {
-  import common.Enrichments._
+  import panop.web.common.Enrichments._
 
   /* Actions */
 
