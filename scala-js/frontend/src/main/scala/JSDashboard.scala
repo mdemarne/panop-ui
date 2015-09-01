@@ -21,7 +21,7 @@ object JSDashboard extends js.JSApp {
   
   private def socketUrl(id: String) = dom.document.location.port match {
     case "9000" => s"ws://${dom.document.location.host}/async/dashboard/$id"
-    case _ => s"wss://${dom.document.location.host}/async/dashboard$id" //TODO
+    case _ => s"wss://panop.herokuapp.com/async/dashboard/$id" //TODO
   }
 
   private def populateSocket(socket: WebSocket): WebSocket = {
