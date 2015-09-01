@@ -16,6 +16,7 @@ lazy val root = (project in file(".")).settings(
       // Databases
       evolutions,
       "com.typesafe.play" %% "anorm" % "2.4.0",
+      "org.postgresql" % "postgresql" % "9.4-1201-jdbc41",
       // Web jars
       "org.webjars" % "jquery" % "2.1.3",
       "org.webjars" % "materializecss" % "0.96.0",
