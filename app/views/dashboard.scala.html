@@ -2,7 +2,7 @@
 
 @import helper.RichHelpers._
 
-@templates.main("Panop - dashboard") {
+@templates.main("Panop - Dashboard"){
   @templates.headers {
     <li><a href="@routes.Main.home()">Home</a></li>
   }
@@ -28,7 +28,7 @@
           </div>
           <div class="row">
             <div class="col s12 l8">
-              <p id="loading-text">@if(staticResults.isEmpty) { LOADING... } else { Search complete. Search date:  @staticResults.get.head.datetime.toLocalDate. }</p>
+              <p id="loading-text">@if(staticResults.isEmpty) { LOADING... } else { Search complete, @{staticResults.get.size} matches. Search date:  @staticResults.get.head.datetime.toLocalDate. }</p>
             </div>
             <div class="col s12 l4">
               @if(staticResults.isEmpty) { <a href="@routes.Search.stop(id)" id="download-button" class="btn-large waves-effect waves-light deep-orange lighten-1">Stop</a> }
@@ -52,13 +52,15 @@
     </div>
   </div>
 
-  @if(staticResults.isEmpty) {
-    @playscalajs.html.scripts("scalaJsFrontend")
-    <script>
-      JSDashboard().startOn("@id");
-    </script>
-  }
-
    @templates.footers()
 
+   @playscalajs.html.scripts("scalaJsFrontend")
+
+}{
+  @if(staticResults.isEmpty) {
+      JSDashboard().startOn("@id");
+  }
+  setTimeout(function(){
+    window.location.reload(1);
+  }, 60000);
 }

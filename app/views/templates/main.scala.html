@@ -1,4 +1,4 @@
-@(title: String)(content: Html = Html(""))
+@(title: String)(content: Html = Html(""))(javascript: Html = Html(""))
 @import helper.RichHelpers._
 
 <!DOCTYPE html>
@@ -39,6 +39,10 @@
       }
     });
   });
+  </script>
+
+  <script>
+    @javascript
   </script>
 
   </body>
