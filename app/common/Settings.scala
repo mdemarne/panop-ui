@@ -12,6 +12,9 @@ import scala.concurrent.duration._
  * @author Mathieu Demarne (mathieu.demarne@gmail.com)
  */
 object Settings {
-  val updateRate = 500.milliseconds // TODO: put that in Play configuration files
+  // TODO: put that in Play configuration files
+  val updateRate = 2.seconds
   val defDepth = 5 // TODO: idem
+  val timeout = 60.seconds // TODO: who cares, this is a toy project!
+  val cleanAfterDays = 6 // In days
 }

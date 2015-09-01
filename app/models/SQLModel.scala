@@ -1,4 +1,4 @@
-package panop.models
+package panop.web.models
 
 import java.sql.Connection
 

@@ -7,6 +7,7 @@ import upickle.default._
 import scala.scalajs.js.annotation.JSExport
 
 import panop.web.shared.models._
+import panop.web.shared.Utils
 
 import org.scalajs.jquery.jQuery
 
@@ -31,20 +32,10 @@ object JSDashboard extends js.JSApp {
       val tick = read[DashboardTick](e.data.toString)
       jQuery("#loading-bar").css("width", (tick.progress.percent*100).toInt + "%")
       jQuery("#loading-text").text(s"Explored ${tick.progress.nbExplored} over ${tick.progress.nbFound}, ${tick.progress.nbMatches} matches, ${tick.progress.nbMissed} not reachable.")
-      val resultsList = tick.results.map {res =>
-        s"""
-          |<div class="row">
-          |    <div class="col s12 l8">
-          |      <a href="${res.url}" target="blank" class="deep-orange-text text-lighten-2">${res.url}</a></b>
-          |    </div>
-          |    <div class="col s12 l4">
-          |      ${res.matches}
-          |    </div>
-          |</div>""".stripMargin
-      }
+      val resultsList = tick.results.map {res => Utils.representResult(res.url, res.matches)}
       val results = resultsList match {
         case Nil => s"""NO RESULT SO FAR..."""
-        case lst => s"""<div class="row"><div class="col s12 l8"><b>Link</b></div><div class="col s12 l4"><b>Matching</b></div></div>""" + lst.mkString
+        case lst => lst.mkString
       }
       jQuery("#results").html(results)
     }

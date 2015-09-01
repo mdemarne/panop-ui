@@ -87,7 +87,7 @@
               </div>
               <h2 class="deep-orange-text text-lighten-2">Optional</h2>
               <div class="row">
-                <div class="input-field col s12">
+                <div class="input-field col s12"> 
                   @helper.inputText(launchForm("domain"), '_label -> "Domain",  'icon -> "mdi-editor-insert-drive-file")
                   <p>If specified, all explored urls will need to be prefixed by the domain (example: <i><b>http://www.crossstream.ch</b></i>).</p>
                 </div>
@@ -110,8 +110,8 @@
               </div>
               <div class="row">
                 <div class="input-field col s12 l6">
-                  @helper.inputText(launchForm("mode"), '_label -> "Search Mode (BFS, DFS, RND)", 'icon -> "mdi-image-center-focus-strong", '_showConstraints -> false)
-                  <p>Can be either BFS (<i>Breath First Search</i>), DFS (<i>Depth First Search</i>) or RND (<i>Random</i>).</p>
+                  @helper.inputText(launchForm("mode"), '_label -> "Search Mode (BFSMode, DFSMode, RNDMode)", 'icon -> "mdi-image-center-focus-strong", '_showConstraints -> false)
+                  <p>Can be either BFSMode (<i>Breath First Search</i>), DFSMode (<i>Depth First Search</i>) or RNDMode (<i>Random</i>).</p>
                 </div>
                 <div class="input-field col s12 l6">
                   @helper.inputText(launchForm("maxSlaves"), '_label -> "Maximum number of search nodes", 'icon -> "mdi-image-filter-3", '_showConstraints -> false)

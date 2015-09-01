@@ -14,6 +14,7 @@ lazy val root = (project in file(".")).settings(
       ws,
       specs2 % Test,
       // Databases
+      evolutions,
       "com.typesafe.play" %% "anorm" % "2.4.0",
       // Web jars
       "org.webjars" % "jquery" % "2.1.3",

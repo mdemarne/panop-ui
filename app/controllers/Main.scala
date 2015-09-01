@@ -17,15 +17,16 @@ import play.api.libs.json._
 import play.api.mvc.WebSocket.FrameFormatter
 import play.api.libs.concurrent._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.libs.Crypto
 import play.libs.Akka
 
 import scala.util.{Try, Failure, Success}
 import scala.util.matching.Regex
-import scala.util.Random
 
 import akka.actor._
 
 import panop._
+import panop.web.workers.Persistence
 
 //TODO: there must be a much nicer way than using that bean and converting it afterwards, but it does not matter right now.
 case class RawQuery(
@@ -105,7 +106,7 @@ class Main extends Controller {
       formWithErrors => BadRequest(views.html.home(formWithErrors)),
       rawQuery => {
         /* NB: the query here is proper, as well as all regexes, no need to check them once more */
-        val id = (new Random).nextInt.toString
+        val id = Crypto.generateToken
         val asys = ActorSystem.create(s"Panop$id")
         val master = asys.actorOf(Props(new Master(asys, rawQuery.maxSlaves)))
         val parsedQuery = com.QueryParser(rawQuery.query).left.get
@@ -114,9 +115,9 @@ class Main extends Controller {
           case x => Some(x)
         }
         val mode = rawQuery.mode match {
-          case "BFS" => com.BFSMode
-          case "DFS" => com.DFSMode
-          case "RND" => com.RNDMode
+          case "BFSMode" => com.BFSMode
+          case "DFSMode" => com.DFSMode
+          case "RNDMode" => com.RNDMode
           case _ => panop.Settings.defMode /* Jumping back to default mode */
         }
         /* Launching a query */
@@ -132,7 +133,9 @@ class Main extends Controller {
             boundaries = (new Regex(rawQuery.topBnds), new Regex(rawQuery.botBnds))
           )
         )
+        val persistence = Akka.system.actorOf(Props(new Persistence(id, master)))
         master ! search
+        persistence ! "persist"
         Cache.set(id, (asys, master))
         Redirect(routes.Search.dashboard(id))
       }

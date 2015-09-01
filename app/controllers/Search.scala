@@ -29,8 +29,8 @@ import upickle._
 
 import panop._
 import panop.web.shared.models._
-
 import panop.web.common.Settings
+import panop.web.models.MResult
 
 /**
  * Global controller for a running search.
@@ -45,14 +45,22 @@ class Search extends Controller {
     Cache.get(id) match {
       case Some((_, master: ActorRef)) => Ok(views.html.dashboard(id, staticResults = None))
       case _ => 
-        Logger.error(s"Search with id $id does not exist.")
-        Redirect(routes.Main.home()) // TODO
+        Try(MResult.fetchById(id)) match {
+          case Success(lst) if !lst.isEmpty => 
+            Ok(views.html.dashboard(id, staticResults = Some(lst)))
+          case Success(_) => Redirect(routes.Main.home())
+          case Failure(err) => 
+            Logger.error("Could not fetch data from DB")
+            Redirect(routes.Main.home())
+        }
     }
   }
 
   def stop(id: String) = Action { implicit request =>
     Cache.get(id) match {
-      case Some((asys: ActorSystem, _)) => asys.shutdown()
+      case Some((asys: ActorSystem, _)) => 
+        asys.shutdown()
+        Cache.remove(id)
       case _ => Logger.error(s"Search: cannot stop id $id, which must already be stopped or does not exist.")
     }
     Redirect(routes.Search.dashboard(id))
@@ -74,11 +82,11 @@ class Search extends Controller {
                   pr.results.map(r => SResult(r.search.url.link, com.Query.printNormalForm(r.matches)))
                 )
                 out ! write(tick)
+                self >! ("ping", Settings.updateRate)
               case _ => Logger.error(s"Inconsistent message from Master.")
             }
           case _ => Logger.error(s"Search with id $id is not live!")
         }
-        self >! ("ping", Settings.updateRate) // TODO
       case othr => Logger.error(s"Display: web socket receiving inconsistent message: ${othr}.")
     }
   }})
