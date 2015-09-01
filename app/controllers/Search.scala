@@ -25,8 +25,10 @@ import scala.util.Random
 
 import akka.actor._
 
+import upickle._
+
 import panop._
-import panop.com._
+import panop.web.shared.models._
 
 import panop.web.common.Settings
 
@@ -61,11 +63,21 @@ class Search extends Controller {
 
   /* Web Sockets */
 
+  // TODO: there is no need of connecting twice to the master, but this is the way panop is buid. Should be changed in the future.
   def dashboardSocket(id: String) = WebSocket.acceptWithActor[String, JsValue](request => out => Props { new Actor {
     def receive = {
       /* Internal controls */
-      case "ping" => 
-        println("hi")
+      case "ping" =>
+        Cache.get(id) match {
+          case Some((_, master: ActorRef)) =>
+            (master !? com.AskProgress, master !? com.AskResults) match {
+              case (pp: com.AswProgress, pr: com.AswResults) =>
+                val tick = DashboardTick(SProgress(pp.percent, pp.nbExplored, pp.nbFound, pp.nbMatches), pr.results.map(r => SResult(r.search.url.link, com.Query.printNormalForm(r.matches))))
+                out ! write(tick)
+              case _ => Logger.error(s"Inconsistent message from Master.")
+            }
+          case _ => Logger.error(s"Search with id $id is not live!")
+        }
         out ! JsNull
         self >! ("ping", Settings.updateRate) // TODO
       case othr => Logger.error(s"Display: web socket receiving inconsistent message: ${othr}.")

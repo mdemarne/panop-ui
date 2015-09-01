@@ -26,7 +26,6 @@ import scala.util.Random
 import akka.actor._
 
 import panop._
-import panop.com._
 
 //TODO: there must be a much nicer way than using that bean and converting it afterwards, but it does not matter right now.
 case class RawQuery(
@@ -54,7 +53,7 @@ class Main extends Controller {
   /* Verifying that the query is in proper normal form */
   val isQueryInNormalForm: Constraint[String] = Constraint("constraints.isQueryInNormalForm")({
     plainText =>
-      QueryParser(plainText) match {
+      com.QueryParser(plainText) match {
         case Right(err) => Invalid(err)
         case _ => Valid
     }
@@ -109,21 +108,21 @@ class Main extends Controller {
         val id = (new Random).nextInt.toString
         val asys = ActorSystem.create(s"Panop$id")
         val master = asys.actorOf(Props(new Master(asys, rawQuery.maxSlaves)))
-        val parsedQuery = QueryParser(rawQuery.query).left.get
+        val parsedQuery = com.QueryParser(rawQuery.query).left.get
         val domain = rawQuery.domain match {
           case "" => None
           case x => Some(x)
         }
         val mode = rawQuery.mode match {
-          case "BFS" => BFSMode
-          case "DFS" => DFSMode
-          case "RND" => RNDMode
+          case "BFS" => com.BFSMode
+          case "DFS" => com.DFSMode
+          case "RND" => com.RNDMode
           case _ => panop.Settings.defMode /* Jumping back to default mode */
         }
         /* Launching a query */
-        val search = Search(
-          Url(rawQuery.url), 
-          Query(
+        val search = com.Search(
+          com.Url(rawQuery.url), 
+          com.Query(
             poss = parsedQuery._1, 
             negs = parsedQuery._2, 
             maxDepth = rawQuery.depth, 

@@ -7,8 +7,8 @@ package shared
  */
 package object models {
 
-  case class Result(url: String, matches: String)
-  case class Progress(percent: Double, nbExplored: Int, nbFound: Int, nbMatches: Int)
+  case class SProgress(percent: Double, nbExplored: Int, nbFound: Int, nbMatches: Int)
+  case class SResult(url: String, matches: String)
 
-  case class DashboardTick(res: List[Result], progress: Progress)
+  case class DashboardTick(progress: SProgress, results: List[SResult])
 }

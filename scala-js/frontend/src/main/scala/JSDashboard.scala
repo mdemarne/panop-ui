@@ -28,8 +28,12 @@ object JSDashboard extends js.JSApp {
     socket.onclose = { (e: CloseEvent) => /* Nothing to do */ }
     socket.onmessage = { (e: MessageEvent) => 
       val tick = read[DashboardTick](e.data.toString)
-      //jQuery("#loading-bar").cssContent("width", tick.progress.percent)
-      // TODO 
+      jQuery("#loading-bar").css(s"width:${tick.progress.percent}%")
+      jQuery("#loading-text").text(s"Explored ${tick.progress.nbExplored} over ${tick.progress.nbFound}, ${tick.progress.nbMatches} matches")
+      val results = tick.results.map {res =>
+        s"""<p><b><a href="${res.url}" target="blank">${res.url}</a></b> matching ${res.matches}</p>"""
+      }
+      jQuery("#results").text(results.mkString)
     }
     socket
   }
@@ -40,7 +44,5 @@ object JSDashboard extends js.JSApp {
   }
 
 
-  def main(): Unit = {
-    jQuery("#results").append("Hi dear!")
-  }
+  def main(): Unit = println("Starting JSDashboard script...")
 }
