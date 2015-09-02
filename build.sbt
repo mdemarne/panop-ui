@@ -30,7 +30,7 @@ lazy val root = (project in file(".")).settings(
   .dependsOn(panopCore, scalaJsSharedJVM)
 
 // Directly depending on the latest panopCore version from Git
-lazy val panopCore = RootProject(uri("https://github.com/mdemarne/panop-core.git"))
+lazy val panopCore = RootProject(uri("https://github.com/mdemarne/panop-core.git#55faee721a55ed914c2e7e130ab079aa003bb795"))
 
 // Play provides two styles of routers, one expects its actions to be injected, the
 // other, legacy style, accesses its actions statically.
