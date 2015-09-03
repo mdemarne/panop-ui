@@ -17,7 +17,7 @@
         <br><br>
         <h1 class="header center deep-orange-text text-lighten-2">Panop</h1>
         <div class="row center">
-          <h3 class="header col s12 light">Simple Tool For Parallel Online Search</h3>
+          <h5 class="header col s12 light">Simple Tool For Parallel Online Search</h5>
         </div>
          <div class="row center">
           <a href="#start" id="download-button" class="btn-large waves-effect waves-light deep-orange lighten-1">Launch A Search !</a>
@@ -71,7 +71,7 @@
               <div class="row">
                 <div class="input-field col s12">
                   @helper.inputText(launchForm("query"), '_label -> "Query", 'icon -> "mdi-action-room", '_showConstraints -> false)
-                  <p>A query is in disjunctive normal form (examples: <i><b>'A'</b></i>, <i><b>'A' AND 'B'</b></i>, <i><b>('A' AND 'B') OR ('B' AND 'C')</b></i>.
+                  <p>A query is in disjunctive normal form (examples: <i><b>'A'</b></i> or <i><b>'A' AND 'B'</b></i> or <i><b>('A' AND 'B') OR ('B' AND 'C')</b></i>.
                   It is also possible to avoid results containing some keywords (examples: <i><b>('A' AND 'B') - ('C' AND 'D')</b></i> where pages containing <i><b>C</b></i> and <i><b>D</b></i> will not be returned, etc.).</p>
                 </div>
               </div>

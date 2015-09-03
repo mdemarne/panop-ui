@@ -16,5 +16,5 @@ object Settings {
   val updateRate = 5.seconds
   val defDepth = 5
   val timeout = 60.seconds // TODO: who cares, this is a toy project!
-  val cleanAfterDays = 6 // In days
+  val cleanAfterDays = 7 // In days
 }
