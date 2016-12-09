@@ -26,12 +26,14 @@ object Enrichments {
   implicit val defaultTimeout = Timeout(defaultTimeoutDuration)
 
   implicit class RichActorRef(actorRef: ActorRef) {
-    /** Send a message and retrieve the answer in a blocking manner, using default timeout. */
+    /** Sends a message and retrieve the answer in a blocking manner, using
+     *  default timeout. */
     def !?(mess: Any) = {
       val resultProm = actorRef ? mess
       Await.result(resultProm, defaultTimeoutDuration)
     }
-    /** Schedule a message to be sent in the future after a specific duration. */
+    /** Schedule a message to be sent in the future after a specific
+     *  duration. */
     def >!(mess: Any, duration: FiniteDuration) = {
       Akka.system.scheduler.scheduleOnce(duration, actorRef, mess)
     }

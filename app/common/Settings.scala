@@ -10,6 +10,7 @@ import scala.concurrent.duration._
 /**
  * Global Settings for panop-web.
  * @author Mathieu Demarne (mathieu.demarne@gmail.com)
+ * @todo   change that to be in settings (better shared with panop-core)
  */
 object Settings {
   // TODO: put that in Play configuration files

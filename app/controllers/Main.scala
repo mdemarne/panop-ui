@@ -28,7 +28,8 @@ import akka.actor._
 import panop._
 import panop.web.workers.Persistence
 
-//TODO: there must be a much nicer way than using that bean and converting it afterwards, but it does not matter right now.
+// TODO: there must be a much nicer way than using that bean and converting it
+// afterwards, but it does not matter right now.
 case class RawQuery(
   query: String,
   url: String,
@@ -44,7 +45,6 @@ case class RawQuery(
  * Global controller to launch a search.
  * @author Mathieu Demarne (mathieu.demarne@gmail.com)
  */
-
 class Main extends Controller {
   import panop.web.common.Enrichments._
   import panop.web.common.Settings
@@ -52,7 +52,8 @@ class Main extends Controller {
   /* Helpers */
 
   /* Verifying that the query is in proper normal form */
-  val isQueryInNormalForm: Constraint[String] = Constraint("constraints.isQueryInNormalForm")({
+  val isQueryInNormalForm: Constraint[String] =
+  Constraint("constraints.isQueryInNormalForm")({
     plainText =>
       com.QueryParser(plainText) match {
         case Right(err) => Invalid(err)
@@ -82,17 +83,18 @@ class Main extends Controller {
       "maxSlaves" -> number.verifying(min(1), max(panop.Settings.defMaxSlaves))
     )(RawQuery.apply)(RawQuery.unapply))
 
-  // TODO: use the unapply from the case class above might avoid having to write that down again!
+  // TODO: use the unapply from the case class above might
+  // avoid having to write that down again!
   val defaultForm = launchForm.fill(
     RawQuery(
-      query = "", 
-      url = "", 
-      depth = panop.Settings.defDepth, 
-      domain = "", 
-      mode = panop.Settings.defMode.toString, 
-      ignExts = panop.Settings.defIgnExts.regex, 
-      topBnds = panop.Settings.defTopBnds.regex, 
-      botBnds = panop.Settings.defBotBnds.regex, 
+      query = "",
+      url = "",
+      depth = panop.Settings.defDepth,
+      domain = "",
+      mode = panop.Settings.defMode.toString,
+      ignExts = panop.Settings.defIgnExts.regex,
+      topBnds = panop.Settings.defTopBnds.regex,
+      botBnds = panop.Settings.defBotBnds.regex,
       maxSlaves = panop.Settings.defSlaves
     )
   )
@@ -105,7 +107,8 @@ class Main extends Controller {
     launchForm.bindFromRequest.fold(
       formWithErrors => BadRequest(views.html.home(formWithErrors)),
       rawQuery => {
-        /* NB: the query here is proper, as well as all regexes, no need to check them once more */
+        /* NB: the query here is proper, as well as all regexes, no need to
+         * check them once more */
         val id = Crypto.generateToken
         val asys = ActorSystem.create(s"Panop$id")
         val master = asys.actorOf(Props(new Master(asys, rawQuery.maxSlaves)))
@@ -122,18 +125,20 @@ class Main extends Controller {
         }
         /* Launching a query */
         val search = com.Search(
-          com.Url(rawQuery.url), 
+          com.Url(rawQuery.url),
           com.Query(
-            poss = parsedQuery._1, 
-            negs = parsedQuery._2, 
-            maxDepth = rawQuery.depth, 
-            domain = domain, 
-            mode = mode, 
-            ignoredFileExtensions = new Regex(rawQuery.ignExts), 
-            boundaries = (new Regex(rawQuery.topBnds), new Regex(rawQuery.botBnds))
+            poss = parsedQuery._1,
+            negs = parsedQuery._2,
+            maxDepth = rawQuery.depth,
+            domain = domain,
+            mode = mode,
+            ignoredFileExtensions = new Regex(rawQuery.ignExts),
+            boundaries = (new Regex(rawQuery.topBnds),
+              new Regex(rawQuery.botBnds))
           )
         )
-        val persistence = Akka.system.actorOf(Props(new Persistence(id, master)))
+        val persistence = Akka.system.actorOf(Props(
+          new Persistence(id, master)))
         master ! search
         persistence ! "persist"
         Cache.set(id, (asys, master))
